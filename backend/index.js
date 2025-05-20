@@ -14,13 +14,22 @@ const quizRoutes = require('./routes/quizRoutes');
 const conceptBattleRoutes = require('./routes/conceptBattleRoutes');
 const slideRoutes = require('./routes/slideRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+const allowedOrigins = require('./config/allowedOrigins');
 
 const app = express();
 const port = 5001;
 
 // Middleware
 app.use(cors({
-  origin: '*',
+  origin: function(origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
